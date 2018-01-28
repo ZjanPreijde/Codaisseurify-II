@@ -9,6 +9,8 @@ class ArtistsController < ApplicationController
   def edit
   end
 
+  # Got stuck in Codaisseurify-I,
+  #   removed functionality
   def update
     # if @artist.update(artist_params)
       # @artist.image = image_params

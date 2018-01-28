@@ -6,6 +6,9 @@
 //  new line in HTML after > shows return sign,
 //  keep text jammed between >< to let innerHTML show pure text
 
+// Can't get it to work
+let suppressAddWithAJAX = true ;
+
 // Document ready, bind events
 $(function() {
   // short for $.( document ).ready(function () {});
@@ -22,7 +25,9 @@ $(function() {
 function myLog(message) {
   // Make it possible to get multiple arguments, like console.log
   let logging = true; // make false to stop logging
-  if (logging) { console.log(message) };
+  if (logging) {
+    console.log(message)
+  };
 }
 // Event bound functions
 function deleteAllSongsClick(event) {
@@ -38,7 +43,7 @@ function deleteAllSongsClick(event) {
     $(".song-delete").each(function(index, element) {
       songId = element.id.replace("song-delete-", "");
       totalCount = totalCount + 1;
-      myLog("Call deleteSong with " + artistId +", " + songId);
+      myLog("Call deleteSong with " + artistId + ", " + songId);
       if (deleteSong(artistId, songId, false)) {
         $.when($("#song-" + songId).remove())
           .then(myLog("Song removed"));
@@ -97,51 +102,29 @@ function addSongClick(event) {
     myLog("- Title is empty")
   } else {
     myLog("- Title :", title);
-    let songId = addSong(title);
-    if (songId > "") {
-      $("#new-title").val(null);
-    }
+    addSong(title);
   }
 };
 
 
 function addSong(title) {
   let artistId = getArtistId();
-  let newSongId = addSongApiCall(artistId, title);
-  if (newSongId > "") {
-    addSongToTable(artistId, newSongId, title)
-  };
-  return newSongId;
+  addSongApiCall(artistId, title);
 };
 
 
-// !! CHECK TODOS.JS for AJAX requests !!
-// API call delete (DELETE)
-// API call resulting in succes will not give us much?
-// curl -i -H "Accept: application/json"
-//  -H "Content-type: application/json"
-//  -X DELETE
-//  http://localhost:3000/api/songs/1
-// => {"message":"Song successfully deleted"}
+// DON'T WORK :
+// url: "/songs/" + songId + ".json",
+// url: "/songs/" + songId,
+// url: "/artists/" + artistId + "/songs/" + songId + ".json",
 function deleteSongApiCall(artistId, songId) {
-  // let apiCall = '-i '+
-  //   ' -H "Accept: application/json"' +
-  //   ' -H "Content-type: application/json"' +
-  //   ' -X DELETE' +
-  //   ' /songs/' + songId;
-
-  // DON'T WORK :
-  // url: "/songs/" + songId + ".json",
-  // url: "/songs/" + songId,
-  // url: "/artists/" + artistId + "/songs/" + songId + ".json",
-
   // I thought this construct would not return untill request
   //   was sent and handled, but action after calling this function
-  //  in calling procedure is before this is executed before the code in .done()
+  //   in calling procedure is before this is executed before the code in .done()
   // It will return immediately,
   //   and makes sure code in .done() runs if successfull
   // So any screen updates within .done() part, not very SRP
-  let deleteFlag = false ;
+  let deleteFlag = false;
   myLog("Sending AJAX request to delete ...");
   $.ajax({
       type: "DELETE",
@@ -156,82 +139,56 @@ function deleteSongApiCall(artistId, songId) {
     .fail(function(error) {
       deleteFlag = false;
     });
-  return deleteFlag ;
+  return deleteFlag;
 }
 
 
-// !! CHECK TODOS.JS for AJAX requests !!
-// API call add (POST), check for string delimiters ( '  "  )
-// What happens if we put quotes in values?
-// curl -i -H "Accept: application/json"
-//  -H "Content-type: application/json"
-//  -d '{"title":"New song"}'
-//  -X POST
-//  http://localhost:3000/api/songs
-// => ?? Does not work :-(
+// From rails routes :
+//              POST   /api/songs(.:format)      api/songs#create
+// new_api_song GET    /api/songs/new(.:format)  api/songs#new
+
+// DOES NOT WORK :
+// url: "/api/songs/new",
+// url: "/api/songs",
+// url: "/api/songs.json",
+// url: "/artists/" + artistId + "/songs",
+// url: "/artists/" + artistId + "/songs/new",
+// url: "/artists/" + artistId + "/songs/new.json",
+// url: "/artists/" + artistId + "/api/songs",
+// url: "/artists/" + artistId + "/api/songs/new",
+
 function addSongApiCall(artistId, title) {
-  let songId = "";
-  // Build data string, 1 field is not very complicated :-)
-  let apiData = "'" + '{"title":"' + title + '"}' + "'";
-  let apiCall = '-i' +
-    ' -H "Accept: application/json"' +
-    ' -H "Content-type: application/json"' +
-    ' -d ' + apiData +
-    ' -X POST' +
-    ' http://localhost:3000/api/songs';
 
-  // API call resulting in succes will give songId
-  songId = Math.floor(Math.random() * 100).toString();
+  if (suppressAddWithAJAX) {
+    let songId = Math.floor((Math.random() * 100) + 1).toString() ;
+    addSongToTable(artistId, songId, title);
+    $("#new-title").val(null);
+    return true;
+   };
 
-  var newSong = { title: title };
-
-  return songId;
-};
-
-function createTodo(title) {
-  var newTodo = {
-    title: title,
-    completed: false
+  let newSong = {
+    title: title
   };
-
   $.ajax({
       type: "POST",
-      url: "/todos.json",
+      url: "/api/songs.json",
       data: JSON.stringify({
-        todo: newTodo
+        song: newSong
       }),
       contentType: "application/json",
       dataType: "json"
     })
     .done(function(data) {
-      console.log(data);
-
-      var checkboxId = data.id;
-
-      var label = $('<label></label>')
-        .attr('for', checkboxId)
-        .html(title);
-
-      var checkbox = $('<input type="checkbox" value="1" />')
-        .attr('id', checkboxId)
-        .bind('change', toggleDone);
-
-      var tableRow = $('<tr class="todo"></td>')
-        .attr('data-id', checkboxId)
-        .append($('<td>').append(checkbox))
-        .append($('<td>').append(label));
-
-      $("#todoList").append(tableRow);
-
-      updateCounters();
+      myLog(data);
+      addSongToTable(artistId, data.id, title);
+      $("#new-title").val(null);
     })
-
     .fail(function(error) {
-      console.log(error)
+      myLog(error)
       error_message = error.responseJSON.title[0];
       showError(error_message);
     });
-}
+};
 
 
 // <table> manipulation

@@ -8,28 +8,6 @@ class Api::SongsController < ApplicationController
   #   ActiveRecordSerializer only returns :id's :-(
   # Oh, might have something to do with song_serializer-
   # Use old skool rendering, don't trust new skool right now
-  def index
-    render status: 200, json: {
-      songs: Song.all
-    }.to_json
-  end
-  # def index
-  #   songs = Song.all
-  #   render status: 200, json: songs
-  # end
-
-  def show
-    song = Song.find(params[:id])
-
-    render status: 200, json: {
-      song: song
-    }.to_json
-  end
-  # def show
-  #   song = Song.find(params[:id])
-  #   render status: 200, json: song
-  # end
-
   def create
     song = Song.new(song_params)
 
