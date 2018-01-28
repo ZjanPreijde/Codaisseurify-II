@@ -171,7 +171,7 @@ function addSongApiCall(artistId, title) {
   };
   $.ajax({
       type: "POST",
-      url: "/api/songs.json",
+      url: "/api/songs/new.json",
       data: JSON.stringify({
         song: newSong
       }),
