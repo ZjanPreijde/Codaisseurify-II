@@ -10,6 +10,13 @@
             </div>
           </div>
           <div class="panel-body">
+
+            <% if notice.present? %>
+              <div class="alert alert-info" role="alert">
+                <%= notice %>
+              </div>
+            <% end %>
+
             <div class="float-left">
               <%= link_to "Back to Artists",
                 artists_path,
@@ -32,8 +39,16 @@
                 <th>#</th>
                 <th class="text-center">Don't like it?</th>
               </tr>
+
               <% @artist.songs.each do |song| %>
-                <tr id="song-<%= song.id %>"">
+
+                <% if song.errors.any? %>
+                  <% song.errors.full_messages.each do |message| %>
+                    <span class="help-block"><%= message %></span>
+                  <% end %>
+                <% end %>
+
+                <tr id="song-<%= song.id %>">
                   <td class="song"><%= song.title %></td>
                   <td>#<%= song.artist_id %>-<%= song.id %></td>
                   <td class="text-center">
