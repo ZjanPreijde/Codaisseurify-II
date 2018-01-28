@@ -14,6 +14,12 @@ Rails.application.routes.draw do
   # rest of the code...
 
   namespace :api do
-    resources :songs
+    resources :artists do
+      resources :songs
+    end
   end
+
+  # namespace :api do
+  #   resources :songs
+  # end
 end

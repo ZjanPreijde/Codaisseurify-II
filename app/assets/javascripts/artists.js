@@ -7,7 +7,7 @@
 //  keep text jammed between >< to let innerHTML show pure text
 
 // Can't get it to work
-let suppressAddWithAJAX = true ;
+let suppressAddWithAJAX = false ;
 
 // Document ready, bind events
 $(function() {
@@ -128,7 +128,7 @@ function deleteSongApiCall(artistId, songId) {
   myLog("Sending AJAX request to delete ...");
   $.ajax({
       type: "DELETE",
-      url: "/api/songs/" + songId,
+      url: "/api/artists/" + artistId + "/songs/" + songId,
       contentType: "application/json",
       dataType: "json"
     })
@@ -144,8 +144,11 @@ function deleteSongApiCall(artistId, songId) {
 
 
 // From rails routes :
-//              POST   /api/songs(.:format)      api/songs#create
-// new_api_song GET    /api/songs/new(.:format)  api/songs#new
+//   POST   /api/songs(.:format)      api/songs#create
+// Made a change in routes, added artists, songs through artists
+// rails routes now shows :
+//   POST   /api/artists/:artist_id/songs(.:format)  api/songs#create
+// Still does not work :-(
 
 // DOES NOT WORK :
 // url: "/api/songs/new",
@@ -163,6 +166,11 @@ function deleteSongApiCall(artistId, songId) {
 //      title: title, artist: 9  or "9"
 //    }; also does not work. How to pass on the artist?
 // adding artist: {id: 9} to data also does not work
+
+// Made a change in routes, added artists, songs through artists
+// rails routes now shows :
+// POST   /api/artists/:artist_id/songs(.:format)  api/songs#create
+// Still does not work :-(
 function addSongApiCall(artistId, title) {
 
   if (suppressAddWithAJAX) {
@@ -177,7 +185,7 @@ function addSongApiCall(artistId, title) {
   };
   $.ajax({
       type: "POST",
-      url: "/api/songs.json",
+      url: "/api/artists/" + artistId + "/songs.json",
       data: JSON.stringify({
         song: newSong
       }),
@@ -191,8 +199,8 @@ function addSongApiCall(artistId, title) {
     })
     .fail(function(error) {
       myLog(error)
-      error_message = error.responseJSON.title[0];
-      showError(error_message);
+//      error_message = error.responseJSON.title[0];
+//      showError(error_message);
     });
 };
 
