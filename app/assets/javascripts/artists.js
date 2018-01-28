@@ -157,6 +157,12 @@ function deleteSongApiCall(artistId, songId) {
 // url: "/artists/" + artistId + "/api/songs",
 // url: "/artists/" + artistId + "/api/songs/new",
 
+// !! url: /api/songs.json is working, but returns
+//    {errors: {artist: ["must exist"]}}
+//    let newSong = {
+//      title: title, artist: 9  or "9"
+//    }; also does not work. How to pass on the artist?
+// adding artist: {id: 9} to data also does not work
 function addSongApiCall(artistId, title) {
 
   if (suppressAddWithAJAX) {
@@ -171,7 +177,7 @@ function addSongApiCall(artistId, title) {
   };
   $.ajax({
       type: "POST",
-      url: "/api/songs/new.json",
+      url: "/api/songs.json",
       data: JSON.stringify({
         song: newSong
       }),
