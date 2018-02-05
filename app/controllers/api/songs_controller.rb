@@ -2,6 +2,7 @@
 
 class Api::SongsController < ApplicationController
   skip_before_action :verify_authenticity_token
+  before_action :set_artist
 
   # For some reason,
   #   show/index,
@@ -10,6 +11,7 @@ class Api::SongsController < ApplicationController
   # Use old skool rendering, don't trust new skool right now
   def create
     song = Song.new(song_params)
+    song.artist_id = @artist.id
 
     if song.save
       render status: 201, json: {
@@ -22,17 +24,6 @@ class Api::SongsController < ApplicationController
       }.to_json
     end
   end
-  # def create
-  #   song = Song.new(song_params)
-  #
-  #   if song.save
-  #     render status: 200, json: song
-  #   else
-  #     render status: 422, json: {
-  #       errors: song.errors
-  #     }.to_json
-  #   end
-  # end
 
   def destroy
     song = Song.find(params[:id])
@@ -43,9 +34,13 @@ class Api::SongsController < ApplicationController
     }.to_json
   end
 
-  private
+private
+
+  def set_artist
+    @artist = Artist.find(params[:artist_id])
+  end
 
   def song_params
-    params.require(:song).permit(:title)
+    params.require(:song).permit(:title, :artist_id)
   end
 end

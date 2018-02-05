@@ -20,7 +20,7 @@ class SongsController < ApplicationController
 
 private
   def set_artist
-    @artist = Artist.find(params[:artist_id])
+    @artist = Artist.find(params[:artist])
   end
 
   def song_params

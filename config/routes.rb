@@ -7,19 +7,10 @@ Rails.application.routes.draw do
 
   get '/bootstrap', to: 'pages#bootstrap', as: 'bootstrap'
 
-end
-
-# API setup
-Rails.application.routes.draw do
-  # rest of the code...
-
+  # API setup
   namespace :api do
     resources :artists do
       resources :songs
     end
   end
-
-  # namespace :api do
-  #   resources :songs
-  # end
 end
